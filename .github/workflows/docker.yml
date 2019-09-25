@@ -1,0 +1,41 @@
+name: Docker
+
+on: [push]
+
+jobs:
+  build-images:
+    strategy:
+      matrix:
+        arch:
+          - amd64
+          - armv7
+          - arm64
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Build image
+        run: ./build --prefix masnagam ${{ matrix.arch }}
+      - name: Login to DockerHub
+        run: docker login -u masnagam -p ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Push image
+        run: docker push masnagam/mirakc:${{ matrix.arch }}
+  build-multiarch-image:
+    runs-on: ubuntu-latest
+    needs: build-images
+    steps:
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: crazy-max/ghaction-docker-buildx@v1
+        with:
+          version: latest
+      - uses: actions/checkout@v1
+      - name: Login to DockerHub
+        run: docker login -u masnagam -p ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build multiarch image
+        run: >-
+          docker buildx build
+          -f Dockerfile.multiarch
+          -t masnagam/mirakc
+          --platform 'linux/amd64,linux/arm/v7,linux/arm64'
+          --push
+          .

@@ -1,0 +1,114 @@
+ARG base_image
+
+# recdvb configuired without `--enable-b25`
+FROM debian:buster-slim AS recdvb-build
+
+ARG recdvb_version=1.3.2
+ARG gcc_host_triple
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -qq
+RUN apt-get install -y -qq --no-install-recommends \
+    ca-certificates curl \
+    autoconf automake make pkg-config g++-$gcc_host_triple
+
+RUN mkdir -p /build
+WORKDIR /build
+RUN curl -fsSL http://www13.plala.or.jp/sat/recdvb/recdvb-$recdvb_version.tgz \
+    | tar -xz --strip-components=1
+RUN ./autogen.sh
+RUN ./configure --prefix=/usr/local --host=$gcc_host_triple
+RUN sed -i -e s/msgbuf/_msgbuf/ recpt1core.h
+RUN sed -i '1i#include <sys/types.h>' recpt1.h
+RUN make -j $(nproc)
+RUN make install
+
+
+# recpt1 configured without `--enable-b25`
+FROM debian:buster-slim AS recpt1-build
+
+ARG gcc_host_triple
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -qq
+RUN apt-get install -y -qq --no-install-recommends \
+    ca-certificates curl \
+    autoconf automake make pkg-config g++-$gcc_host_triple
+
+RUN mkdir -p /build
+WORKDIR /build
+RUN curl -fsSL https://github.com/stz2012/recpt1/tarball/master \
+    | tar -xz --strip-components=1
+WORKDIR /build/recpt1
+RUN ./autogen.sh
+RUN ./configure --prefix=/usr/local --host=$gcc_host_triple
+RUN make -j $(nproc)
+RUN make install
+
+
+# mirakc-arib
+FROM debian:buster-slim AS mirakc-arib-build
+
+ARG gcc_host_triple
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -qq
+RUN apt-get install -y -qq --no-install-recommends \
+    ca-certificates curl \
+    cmake git dos2unix make ninja-build autoconf automake libtool pkg-config \
+    g++-$gcc_host_triple
+
+RUN mkdir -p /build
+WORKDIR /build
+RUN curl -fsSL https://github.com/masnagam/mirakc-arib/tarball/master \
+    | tar -xz --strip-components=1
+RUN cmake -S . -B . -G Ninja -D CMAKE_BUILD_TYPE=Release \
+    -D CMAKE_TOOLCHAIN_FILE=/build/toolchain.cmake.d/debian-${gcc_host_triple}.cmake
+RUN ninja vendor
+RUN ninja
+
+
+# mirakc
+FROM rust:slim-buster AS mirakc-build
+
+ARG gcc_host_triple
+ARG rust_target_triple
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -qq
+RUN apt-get install -y -qq --no-install-recommends \
+    ca-certificates curl g++-$gcc_host_triple
+
+RUN rustup target add $rust_target_triple
+
+RUN mkdir -p /build
+WORKDIR /build
+RUN curl -fsSL https://github.com/masnagam/mirakc/tarball/master \
+    | tar -xz --strip-components=1
+# See: https://github.com/japaric/rust-cross
+#      https://doc.rust-lang.org/cargo/reference/config.html
+RUN mkdir -p .cargo
+RUN echo "[target.$rust_target_triple]" >.cargo/config
+RUN echo "linker = \"${gcc_host_triple}-gcc\"" >>.cargo/config
+RUN cargo build --release --target $rust_target_triple
+RUN cp /build/target/$rust_target_triple/release/mirakc /usr/local/bin/
+
+
+# final image
+FROM $base_image
+LABEL maintainer="Masayuki Nagamachi <masayuki.nagamachi@gmail.com>"
+
+COPY --from=recdvb-build /usr/local/bin/recdvb /usr/local/bin/
+COPY --from=recpt1-build /usr/local/bin/recpt1 /usr/local/bin/
+COPY --from=mirakc-arib-build /build/bin/mirakc-arib /usr/local/bin/
+COPY --from=mirakc-build /usr/local/bin/mirakc /usr/local/bin/
+
+ENV MIRAKC_CONFIG=/etc/mirakc/config.yml
+EXPOSE 40772
+VOLUME ["/var/lib/mirakc/epg"]
+ENTRYPOINT ["mirakc"]
+CMD []

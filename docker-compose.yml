@@ -1,0 +1,53 @@
+version: '3.7'
+
+services:
+  mirakc:
+    image: $USER/mirakc
+    build: .
+    container_name: mirakc
+    init: true
+    restart: unless-stopped
+    devices:
+      # Change the following settings according to your environment.
+      # See also the `environment` property.
+      - /dev/px4video0
+      - /dev/px4video1
+      - /dev/px4video2
+      - /dev/px4video3
+      - /dev/px4video4
+      - /dev/px4video5
+      - /dev/px4video6
+      - /dev/px4video7
+    networks:
+      - default-network
+    ports:
+      - 40772:40772
+    volumes:
+      - mirakc-epg:/var/lib/mirakc/epg
+      - ./sample-mirakc-config.yml:/etc/mirakc/config.yml:ro
+    environment:
+      TZ: Asia/Tokyo
+      # Log level of `mirakc`.
+      # See README.md in masnagam/mirakc.
+      RUST_LOG: info
+      # Output info-level log messages from child processes like
+      # `mirakc-arib collect-eits` for debugging purpose.
+      #
+      # Normally, you don't need to define the following environment variables.
+      MIRAKC_DEBUG_CHILD_PROCESS: ''
+      MIRAKC_ARIG_LOG: info
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '5'
+
+networks:
+  default-network:
+    name: mirakc_network
+    driver: bridge
+
+volumes:
+  mirakc-epg:
+    name: mirakc_epg
+    driver: local

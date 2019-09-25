@@ -1,0 +1,88 @@
+#!/bin/sh
+
+set -eu
+
+PROGNAME=$(basename $0)
+BASEDIR=$(cd $(dirname $0); pwd)
+
+PREFIX=$(id -un)
+
+help() {
+    cat <<EOF >&2
+Build a Docker image for an architecture
+
+Usage:
+  $PROGNAME -h | --help
+  $PROGNAME [--prefix <prefix>] <arch>
+
+Options:
+  -h, --help         Show help
+  --prefix <prefix>  Prefix of the Docker Image (Default: $PREFIX)
+
+Arguments:
+  <arch>  Architecture of the Docker image (amd64|armv7|arm64)
+EOF
+    exit 0
+}
+
+error() {
+    echo "$1" >&2
+    exit 1
+}
+
+for OPT in "$@"
+do
+    case $OPT in
+        '-h' | '--help')
+            help
+            ;;
+        '--prefix')
+            PREFIX="$2"
+            shift 2
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+ARCH=$1
+
+case $ARCH in
+    amd64)
+        # Assumed that the CPU architecture of build machine is amd64
+        #DOCKERFILE=Dockerfile.cross
+        #BASE_IMAGE=amd64/debian:buster-slim
+        #GCC_HOST_TRIPLE=x86-64-linux-gnu
+        #RUST_TARGET_TRIPLE=x86_64-unknown-linux-gnu
+        DOCKERFILE=Dockerfile
+        BASE_IMAGE=
+        GCC_HOST_TRIPLE=
+        RUST_TARGET_TRIPLE=
+        ;;
+    armv7)
+        DOCKERFILE=Dockerfile.cross
+        BASE_IMAGE=arm32v7/debian:buster-slim
+        GCC_HOST_TRIPLE=arm-linux-gnueabihf
+        RUST_TARGET_TRIPLE=armv7-unknown-linux-gnueabihf
+        ;;
+    arm64)
+        DOCKERFILE=Dockerfile.cross
+        BASE_IMAGE=arm64v8/debian:buster-slim
+        GCC_HOST_TRIPLE=aarch64-linux-gnu
+        RUST_TARGET_TRIPLE=aarch64-unknown-linux-gnu
+        ;;
+    *)
+        error "Unsupported: $ARCH"
+        ;;
+esac
+
+export DOCKER_BUILDKIT=1
+
+docker build \
+  -t $PREFIX/mirakc:$ARCH \
+  -f $DOCKERFILE \
+  --build-arg base_image=$BASE_IMAGE \
+  --build-arg gcc_host_triple=$GCC_HOST_TRIPLE \
+  --build-arg rust_target_triple=$RUST_TARGET_TRIPLE \
+  .
