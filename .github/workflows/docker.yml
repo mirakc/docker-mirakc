@@ -1,6 +1,9 @@
 name: Docker
 
-on: [push]
+on:
+  push:
+  schedule:
+    - cron: 3 4 * * *
 
 jobs:
   build-images:
