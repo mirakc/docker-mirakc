@@ -3,7 +3,7 @@ name: Docker
 on:
   push:
   schedule:
-    - cron: 3 4 * * *
+    - cron: 3 19 * * *
 
 jobs:
   build-images:
