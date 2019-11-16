@@ -24,7 +24,7 @@ Options:
   --squash           Squash newly built layers into a single new layer
 
 Arguments:
-  <arch>  Architecture of the Docker image (amd64|armv5|armv7|arm64v8)
+  <arch>  Architecture of the Docker image (amd64|armv5|armv7|arm64)
 EOF
     exit 0
 }
@@ -88,7 +88,7 @@ case $ARCH in
         GCC_HOST_TRIPLE=arm-linux-gnueabihf
         RUST_TARGET_TRIPLE=armv7-unknown-linux-gnueabihf
         ;;
-    arm64v8)
+    arm64)
         DOCKERFILE=Dockerfile.cross
         DEBIAN_ARCH=arm64
         BASE_IMAGE=arm64v8/debian:buster-slim
