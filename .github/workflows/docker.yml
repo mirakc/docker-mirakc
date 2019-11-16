@@ -19,7 +19,7 @@ jobs:
       - name: Build image
         env:
           DOCKER_BUILDKIT: 1
-        run: ./build --prefix masnagam ${{ matrix.arch }}
+        run: ./build --prefix masnagam --no-cache --squash ${{ matrix.arch }}
       - name: Login to DockerHub
         run: docker login -u masnagam -p ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Push image

@@ -6,6 +6,8 @@ PROGNAME=$(basename $0)
 BASEDIR=$(cd $(dirname $0); pwd)
 
 PREFIX=$(id -un)
+NO_CACHE=no
+SQUASH=no
 
 help() {
     cat <<EOF >&2
@@ -18,6 +20,8 @@ Usage:
 Options:
   -h, --help         Show help
   --prefix <prefix>  Prefix of the Docker Image (Default: $PREFIX)
+  --no-cache         Do not use cache when building the image
+  --squash           Squash newly built layers into a single new layer
 
 Arguments:
   <arch>  Architecture of the Docker image (amd64|arm32v5|arm32v7|arm64v8)
@@ -39,6 +43,14 @@ do
         '--prefix')
             PREFIX="$2"
             shift 2
+            ;;
+        '--no-cache')
+            NO_CACHE=yes
+            shift
+            ;;
+        '--squash')
+            SQUASH=yes
+            shift
             ;;
         *)
             break
@@ -88,7 +100,17 @@ case $ARCH in
         ;;
 esac
 
-docker build --squash -t $PREFIX/mirakc:$ARCH -f $DOCKERFILE \
+BUILD_OPTIONS=
+
+if [ "$NO_CACHE" = yes ]; then
+    BUILD_OPTIONS="$BUILD_OPTIONS --no-cache"
+fi
+
+if [ "$SQUASH" = yes ]; then
+    BUILD_OPTIONS="$BUILD_OPTIONS --squash"
+fi
+
+docker build $BUILD_OPTIONS -t $PREFIX/mirakc:$ARCH -f $DOCKERFILE \
   --build-arg base_image=$BASE_IMAGE \
   --build-arg debian_arch=$DEBIAN_ARCH \
   --build-arg gcc_host_triple=$GCC_HOST_TRIPLE \
