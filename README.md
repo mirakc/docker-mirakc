@@ -1,6 +1,7 @@
 # Dockerfile for mirakc
 
 [![ci-status](https://github.com/masnagam/docker-mirakc/workflows/Docker/badge.svg)](https://github.com/masnagam/docker-mirakc/actions?workflow=Docker)
+![Docker Pulls](https://img.shields.io/docker/pulls/masnagam/mirakc)
 
 ## Build images
 
@@ -13,11 +14,11 @@ $ docker build .
 Cross-build for ROCK64:
 
 ```console
-$ ./build arm64v8
+$ ./build arm64
 ```
 
-The `build` script creates a Docker image for the `arm64v8` architecture.  The
-image is named and tagged with `$(id -un)/mirakc:arm64v8`.
+The `build` script creates a Docker image for the `arm64` architecture.  The
+image is named and tagged with `$(id -un)/mirakc:arm64`.
 
 An image contains the following executables:
 
@@ -25,6 +26,8 @@ An image contains the following executables:
 * [recpt1] configured without `--enable-b25`
 * [mirakc-arib]
 * [mirakc]
+* [curl]
+* [socat]
 
 When running the `build` script, the executables above are cross-compiled with a
 cross-compiler instead of compiling them with the QEMU user mode emulation, in
@@ -39,7 +42,7 @@ below:
 
 ```console
 $ docker images --format "{{.Repository}}:{{.Tag}}"
-masnagam/mirakc:arm64v8
+masnagam/mirakc:arm64
 <none>:<none>
 ...
 ```
@@ -88,5 +91,7 @@ shall be dual licensed as above, without any additional terms or conditions.
 [recpt1]: https://github.com/stz2012/recpt1
 [mirakc-arib]: https://github.com/masnagam/mirakc-arib
 [mirakc]: https://github.com/masnagam/mirakc
+[curl]: https://curl.haxx.se/docs/manpage.html
+[socat]: http://www.dest-unreach.org/socat/doc/socat.html
 [LICENSE-APACHE]: ./LICENSE-APACHE
 [LICENSE-MIT]: ./LICENSE-MIT
