@@ -21,7 +21,7 @@ jobs:
           DOCKER_BUILDKIT: 1
         # Experimental features including the --squash option has not been
         # supported in GitHub Actions at this moment...
-        run: ./build --prefix masnagam --no-cache {{ matrix.arch }}
+        run: ./build --prefix masnagam --no-cache ${{ matrix.arch }}
       - name: Login to DockerHub
         run: docker login -u masnagam -p ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Push image
