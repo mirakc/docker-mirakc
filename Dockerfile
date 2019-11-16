@@ -87,6 +87,16 @@ COPY --from=recpt1-build /usr/local/bin/recpt1 /usr/local/bin/
 COPY --from=mirakc-arib-build /build/bin/mirakc-arib /usr/local/bin/
 COPY --from=mirakc-build /build/target/release/mirakc /usr/local/bin/
 
+RUN set -eux \
+ && export DEBIAN_FRONTEND=noninteractive \
+ && apt-get update -qq \
+ && apt-get install -y -qq --no-install-recommends ca-certificates curl socat \
+ # cleanup
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/* \
+ && rm -rf /var/tmp/* \
+ && rm -rf /tmp/*
+
 ENV MIRAKC_CONFIG=/etc/mirakc/config.yml
 EXPOSE 40772
 VOLUME ["/var/lib/mirakc/epg"]
