@@ -10,12 +10,17 @@ jobs:
       matrix:
         arch:
           - amd64
-          #- arm32v5  # unsupported in GitHub Actions at this moment
+          - arm32v5
           - arm32v7
           - arm64v8
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - name: Setup QEMU user-mode emulation
+        run: |-
+          sudo apt-get update
+          sudo apt-get install -y qemu qemu-user-static
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
       - name: Build image
         env:
           DOCKER_BUILDKIT: 1
@@ -43,6 +48,6 @@ jobs:
           docker buildx build
           -f Dockerfile.multiarch
           -t masnagam/mirakc
-          --platform 'linux/amd64,linux/arm/v7,linux/arm64/v8'
+          --platform 'linux/amd64,linux/arm/v5,linux/arm/v7,linux/arm64/v8'
           --push
           .
