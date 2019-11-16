@@ -13,11 +13,11 @@ $ docker build .
 Cross-build for ROCK64:
 
 ```console
-$ ./build arm64
+$ ./build arm64v8
 ```
 
-The `build` script creates a Docker image for the `arm64` architecture.  The
-image is named and tagged with `$(id -un)/mirakc:arm64`.
+The `build` script creates a Docker image for the `arm64v8` architecture.  The
+image is named and tagged with `$(id -un)/mirakc:arm64v8`.
 
 An image contains the following executables:
 
@@ -39,7 +39,7 @@ below:
 
 ```console
 $ docker images --format "{{.Repository}}:{{.Tag}}"
-masnagam/mirakc:arm64
+masnagam/mirakc:arm64v8
 <none>:<none>
 ...
 ```
