@@ -101,7 +101,7 @@ RUN cp /build/target/$rust_target_triple/release/mirakc /usr/local/bin/
 
 # final image
 FROM $base_image
-LABEL maintainer="Masayuki Nagamachi <masayuki.nagamachi@gmail.com>"
+LABEL maintainer="Masayuki Nagamachi <masnagam@gmail.com>"
 
 COPY --from=recdvb-build /usr/local/bin/recdvb /usr/local/bin/
 COPY --from=recpt1-build /usr/local/bin/recpt1 /usr/local/bin/

@@ -81,6 +81,7 @@ RUN cargo build --release
 
 # final image
 FROM debian:buster-slim
+LABEL maintainer="Masayuki Nagamachi <masnagam@gmail.com>"
 
 COPY --from=recdvb-build /usr/local/bin/recdvb /usr/local/bin/
 COPY --from=recpt1-build /usr/local/bin/recpt1 /usr/local/bin/

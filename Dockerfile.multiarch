@@ -1,7 +1,7 @@
 FROM masnagam/mirakc:${TARGETARCH}${TARGETVARIANT} AS image
 
 FROM debian:buster-slim
-LABEL maintainer="Masayuki Nagamachi <masayuki.nagamachi@gmail.com>"
+LABEL maintainer="Masayuki Nagamachi <masnagam@gmail.com>"
 
 COPY --from=image /usr/local/bin/* /usr/local/bin/
 
