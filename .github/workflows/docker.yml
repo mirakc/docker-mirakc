@@ -10,8 +10,8 @@ jobs:
       matrix:
         arch:
           - amd64
-          - arm32v5
-          - arm32v7
+          - armv5
+          - armv7
           - arm64v8
     runs-on: ubuntu-latest
     steps:
