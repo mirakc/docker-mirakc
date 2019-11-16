@@ -51,6 +51,7 @@ RUN make install
 # mirakc-arib
 FROM debian:buster-slim AS mirakc-arib-build
 
+ARG debian_arch
 ARG gcc_host_triple
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -66,7 +67,7 @@ WORKDIR /build
 RUN curl -fsSL https://github.com/masnagam/mirakc-arib/tarball/master \
     | tar -xz --strip-components=1
 RUN cmake -S . -B . -G Ninja -D CMAKE_BUILD_TYPE=Release \
-    -D CMAKE_TOOLCHAIN_FILE=/build/toolchain.cmake.d/debian-${gcc_host_triple}.cmake
+    -D CMAKE_TOOLCHAIN_FILE=/build/toolchain.cmake.d/debian-$debian_arch.cmake
 RUN ninja vendor
 RUN ninja
 

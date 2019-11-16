@@ -20,7 +20,7 @@ Options:
   --prefix <prefix>  Prefix of the Docker Image (Default: $PREFIX)
 
 Arguments:
-  <arch>  Architecture of the Docker image (amd64|armv7|arm64)
+  <arch>  Architecture of the Docker image (amd64|arm32v5|arm32v7|arm64v8)
 EOF
     exit 0
 }
@@ -53,21 +53,32 @@ case $ARCH in
         # Assumed that the CPU architecture of build machine is amd64
         #DOCKERFILE=Dockerfile.cross
         #BASE_IMAGE=amd64/debian:buster-slim
+        #DEBIAN_ARCH=amd64
         #GCC_HOST_TRIPLE=x86-64-linux-gnu
         #RUST_TARGET_TRIPLE=x86_64-unknown-linux-gnu
         DOCKERFILE=Dockerfile
         BASE_IMAGE=
+        DEBIAN_ARCH=
         GCC_HOST_TRIPLE=
         RUST_TARGET_TRIPLE=
         ;;
-    armv7)
+    arm32v5)
+        DOCKERFILE=Dockerfile.cross
+        BASE_IMAGE=arm32v5/debian:buster-slim
+        DEBIAN_ARCH=armel
+        GCC_HOST_TRIPLE=arm-linux-gnueabi
+        RUST_TARGET_TRIPLE=arm-unknown-linux-gnueabi
+        ;;
+    arm32v7)
         DOCKERFILE=Dockerfile.cross
         BASE_IMAGE=arm32v7/debian:buster-slim
+        DEBIAN_ARCH=armhf
         GCC_HOST_TRIPLE=arm-linux-gnueabihf
         RUST_TARGET_TRIPLE=armv7-unknown-linux-gnueabihf
         ;;
-    arm64)
+    arm64v8)
         DOCKERFILE=Dockerfile.cross
+        DEBIAN_ARCH=arm64
         BASE_IMAGE=arm64v8/debian:buster-slim
         GCC_HOST_TRIPLE=aarch64-linux-gnu
         RUST_TARGET_TRIPLE=aarch64-unknown-linux-gnu
@@ -77,12 +88,9 @@ case $ARCH in
         ;;
 esac
 
-export DOCKER_BUILDKIT=1
-
-docker build \
-  -t $PREFIX/mirakc:$ARCH \
-  -f $DOCKERFILE \
+docker build --squash -t $PREFIX/mirakc:$ARCH -f $DOCKERFILE \
   --build-arg base_image=$BASE_IMAGE \
+  --build-arg debian_arch=$DEBIAN_ARCH \
   --build-arg gcc_host_triple=$GCC_HOST_TRIPLE \
   --build-arg rust_target_triple=$RUST_TARGET_TRIPLE \
   .

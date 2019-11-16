@@ -58,8 +58,7 @@ RUN mkdir -p /build
 WORKDIR /build
 RUN curl -fsSL https://github.com/masnagam/mirakc-arib/tarball/master \
     | tar -xz --strip-components=1
-RUN cmake -S . -B . -G Ninja -D CMAKE_BUILD_TYPE=Release \
-    -D MIRAKC_ARIB_TSDUCK_DEFS_EXTRA="$mirakc_arib_tsduck_defs_extra"
+RUN cmake -S . -B . -G Ninja -D CMAKE_BUILD_TYPE=Release
 RUN ninja vendor
 RUN ninja
 
