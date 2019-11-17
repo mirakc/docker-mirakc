@@ -1,4 +1,5 @@
 server:
+  # Use '0.0.0.0' (ipv4) or '::' (ipv6) if connecting from other hosts
   address: '0.0.0.0'
   port: 40772
   workers: 10
@@ -64,38 +65,23 @@ channels:
     excluded-services: [531]
 
 tuners:
-  - name: gr1
-    types: [GR]
-    command: >-
-      recpt1 --device /dev/px4video2 {{channel}} {{duration}} -
-  - name: gr2
-    types: [GR]
-    command: >-
-      recpt1 --device /dev/px4video3 {{channel}} {{duration}} -
-  - name: gr3
-    types: [GR]
-    command: >-
-      recpt1 --device /dev/px4video6 {{channel}} {{duration}} -
-  - name: gr4
-    types: [GR]
-    command: >-
-      recpt1 --device /dev/px4video7 {{channel}} {{duration}} -
   - name: bs1
     types: [BS]
     command: >-
       recpt1 --device /dev/px4video0 {{channel}} {{duration}} -
-  - name: bs2
-    types: [BS]
+  # Use a tuner on a remote host connected with SSH.
+  # You need to mount a SSH private key onto a Docker container.
+  - name: remote-dvb
+    types: [GR]
     command: >-
-      recpt1 --device /dev/px4video1 {{channel}} {{duration}} -
-  - name: bs3
-    types: [BS]
-    command: >-
-      recpt1 --device /dev/px4video4 {{channel}} {{duration}} -
-  - name: bs4
-    types: [BS]
-    command: >-
-      recpt1 --device /dev/px4video5 {{channel}} {{duration}} -
+      ssh HOST recdvb {{channel}} {{duration}} -
+  # Use a Mirakurun-compatible server as a tuner.
+  # The duration query parameter works only for mirakc servers.
+  - name: upstream
+    types: [GR, BS]
+    command: |-
+      curl -sG http://HOST:40772/api/channels/{{channel_type}}/{{channel}}/stream
+      -d duration={{duration}}
 
 tools:
   scan-services: >-
@@ -106,5 +92,13 @@ tools:
     mirakc-arib filter-packets --sid={{sid}}
   filter-program: >-
     mirakc-arib filter-packets --sid={{sid}} --eid={{eid}}
+  # Preprocess TS packets by using a server running on a remote host.
+  # The preprocess command is called before the filter-program command.
+  preprocess: >-
+    socat - tcp-connect:HOST:40773
+  # Postprocess TS packets by using a server running on a remote host.
+  # The postprocess command is called after the filter-program command.
+  postprocess: >-
+    socat - tcp-connect:HOST:40774
 
 epg-cache-dir: /var/lib/mirakc/epg

@@ -2,8 +2,7 @@ version: '3.7'
 
 services:
   mirakc:
-    image: $USER/mirakc
-    build: .
+    image: masnagam/mirakc
     container_name: mirakc
     init: true
     restart: unless-stopped
@@ -11,13 +10,6 @@ services:
       # Change the following settings according to your environment.
       # See also the `environment` property.
       - /dev/px4video0
-      - /dev/px4video1
-      - /dev/px4video2
-      - /dev/px4video3
-      - /dev/px4video4
-      - /dev/px4video5
-      - /dev/px4video6
-      - /dev/px4video7
     networks:
       - default-network
     ports:

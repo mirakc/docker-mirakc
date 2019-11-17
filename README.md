@@ -61,9 +61,30 @@ which can be accessed using SSH:
 $ docker save $(id -un)/mirakc:arm64 | docker -H ssh://remote load
 ```
 
-## Create a mirakc container
+## Launch a mirakc Docker container using `docker-compose`
 
-See [docker-compose.yml](./docker-compose.yml).
+See [docker-compose.yml](./docker-compose.yml) and
+[sample-mirakc-config.yml](./sample-mirakc-config.yml).
+
+## Build a custom Docker image
+
+A custom Docker image for the linux/arm64 architecture can be built with the
+following Dockerfile:
+
+```Dockerfile
+FROM masnagam/mirakc:arm64
+...
+```
+
+Images for the following architectures have been uploaded to [DockerHub].
+
+* masnagam/mirakc:amd64 (linux/amd64)
+* masnagam/mirakc:armv5 (linux/arm/v5)
+* masnagam/mirakc:armv7 (linux/arm/v7)
+* masnagam/mirakc:arm64 (linux/arm64)
+
+Consult [Dockerfile.cross](./Dockerfile.cross) if you like to build a Docker
+image for an architecture other than the above.
 
 ## Performance
 
@@ -93,5 +114,6 @@ shall be dual licensed as above, without any additional terms or conditions.
 [mirakc]: https://github.com/masnagam/mirakc
 [curl]: https://curl.haxx.se/docs/manpage.html
 [socat]: http://www.dest-unreach.org/socat/doc/socat.html
+[DockerHub]: https://hub.docker.com/r/masnagam/mirakc/tags
 [LICENSE-APACHE]: ./LICENSE-APACHE
 [LICENSE-MIT]: ./LICENSE-MIT
