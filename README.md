@@ -1,7 +1,7 @@
 # Dockerfile for mirakc
 
 [![ci-status](https://github.com/masnagam/docker-mirakc/workflows/Docker/badge.svg)](https://github.com/masnagam/docker-mirakc/actions?workflow=Docker)
-![Docker Pulls](https://img.shields.io/docker/pulls/masnagam/mirakc)
+[![Docker Pulls](https://img.shields.io/docker/pulls/masnagam/mirakc)](https://hub.docker.com/r/masnagam/mirakc)
 
 ## Build images
 
