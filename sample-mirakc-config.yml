@@ -79,19 +79,23 @@ tuners:
   # The duration query parameter works only for mirakc servers.
   - name: upstream
     types: [GR, BS]
-    command: |-
+    command: >-
       curl -sG http://HOST:40772/api/channels/{{channel_type}}/{{channel}}/stream
       -d duration={{duration}}
 
 tools:
   scan-services: >-
     mirakc-arib scan-services{{#xsids}} --xsid={{.}}{{/xsids}}
+  sync-clock: >-
+    mirakc-arib sync-clock
   collect-eits: >-
     mirakc-arib collect-eits{{#xsids}} --xsid={{.}}{{/xsids}}
   filter-service: >-
-    mirakc-arib filter-packets --sid={{sid}}
+    mirakc-arib filter-service --sid={{sid}}
   filter-program: >-
-    mirakc-arib filter-packets --sid={{sid}} --eid={{eid}}
+    mirakc-arib filter-program --sid={{sid}} --eid={{eid}}
+    --clock-pcr={{clock_pcr}} --clock-time={{clock_time}}
+    --start-margin=5000 --end-margin=5000
   # Preprocess TS packets by using a server running on a remote host.
   # The preprocess command is called before the filter-program command.
   preprocess: >-
