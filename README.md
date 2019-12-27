@@ -17,6 +17,12 @@ Cross-build for ROCK64:
 $ ./build arm64
 ```
 
+Build with BuildKit:
+
+```console
+$ DOCKER_BUILDKIT=1 ./build arm64
+```
+
 The `build` script creates a Docker image for the `arm64` architecture.  The
 image is named and tagged with `$(id -un)/mirakc:arm64`.
 
