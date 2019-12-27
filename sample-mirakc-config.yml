@@ -32,11 +32,9 @@ channels:
   - name: BS1
     type: BS
     channel: BS15_0
-    excluded-services: [700, 701, 707, 929]
   - name: BSプレミアム
     type: BS
     channel: BS03_1
-    services: [103, 104]
   - name: BS日テレ
     type: BS
     channel: BS13_0
@@ -49,7 +47,6 @@ channels:
   - name: BSテレ東
     type: BS
     channel: BS01_2
-    excluded-services: [777]
   - name: BSフジ
     type: BS
     channel: BS13_1
