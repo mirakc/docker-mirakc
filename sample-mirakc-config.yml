@@ -59,7 +59,6 @@ channels:
   - name: 放送大学
     type: BS
     channel: BS11_2
-    excluded-services: [531]
 
 tuners:
   - name: bs1
@@ -82,11 +81,11 @@ tuners:
 
 tools:
   scan-services: >-
-    mirakc-arib scan-services{{#xsids}} --xsid={{.}}{{/xsids}}
+    mirakc-arib scan-services
   sync-clock: >-
     mirakc-arib sync-clock
   collect-eits: >-
-    mirakc-arib collect-eits{{#xsids}} --xsid={{.}}{{/xsids}}
+    mirakc-arib collect-eits
   filter-service: >-
     mirakc-arib filter-service --sid={{sid}}
   filter-program: >-
