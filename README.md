@@ -1,3 +1,9 @@
+# DO NOT USE THIS REPOSITORY ANYMORE
+
+This repository has been merged into [mirakc].
+
+See https://github.com/masnagam/mirakc#build-a-custom-docker-image.
+
 # Dockerfile for mirakc
 
 [![ci-status](https://github.com/masnagam/docker-mirakc/workflows/Docker/badge.svg)](https://github.com/masnagam/docker-mirakc/actions?workflow=Docker)
